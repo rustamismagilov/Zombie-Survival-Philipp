@@ -153,6 +153,7 @@ GameObject:
   - component: {fileID: 1978471637655604388}
   - component: {fileID: 5420857361349278248}
   - component: {fileID: 8616685848737228376}
+  - component: {fileID: 2612537631998410760}
   m_Layer: 8
   m_Name: PlayerCapsule
   m_TagString: Player
@@ -368,6 +369,19 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &2612537631998410760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8616685848737228372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d72506c32de9ba04a97603ffeca1d436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitPoints: 100
 --- !u!1001 &3000473592672321048
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -376,6 +390,28 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8997996947095583982}
     m_Modifications:
+    - target: {fileID: 2698415496841451252, guid: 2d3a85ecde41a8246a79669975912b74,
+        type: 3}
+      propertyPath: muzzleFlash
+      value: 
+      objectReference: {fileID: 560875069467457552}
+    - target: {fileID: 2698415496841451252, guid: 2d3a85ecde41a8246a79669975912b74,
+        type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 3073334848392643486, guid: ea1779f85d07b214985ad42a0aed6adb,
+        type: 3}
+    - target: {fileID: 3685810770773415754, guid: 2d3a85ecde41a8246a79669975912b74,
+        type: 3}
+      propertyPath: muzzleFlash
+      value: 
+      objectReference: {fileID: 6700992741654837911}
+    - target: {fileID: 3685810770773415754, guid: 2d3a85ecde41a8246a79669975912b74,
+        type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 3073334848392643486, guid: ea1779f85d07b214985ad42a0aed6adb,
+        type: 3}
     - target: {fileID: 9005220659476430818, guid: 2d3a85ecde41a8246a79669975912b74,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -431,14 +467,43 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainCamera
       objectReference: {fileID: 0}
+    - target: {fileID: 9155453894896321571, guid: 2d3a85ecde41a8246a79669975912b74,
+        type: 3}
+      propertyPath: muzzleFlash
+      value: 
+      objectReference: {fileID: 612042397799677522}
+    - target: {fileID: 9155453894896321571, guid: 2d3a85ecde41a8246a79669975912b74,
+        type: 3}
+      propertyPath: impactEffect
+      value: 
+      objectReference: {fileID: 3073334848392643486, guid: ea1779f85d07b214985ad42a0aed6adb,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2d3a85ecde41a8246a79669975912b74, type: 3}
+--- !u!198 &560875069467457552 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 3344892710410946056, guid: 2d3a85ecde41a8246a79669975912b74,
+    type: 3}
+  m_PrefabInstance: {fileID: 3000473592672321048}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &612042397799677522 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 2440312751759786058, guid: 2d3a85ecde41a8246a79669975912b74,
+    type: 3}
+  m_PrefabInstance: {fileID: 3000473592672321048}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6150556650386588154 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9005220659476430818, guid: 2d3a85ecde41a8246a79669975912b74,
+    type: 3}
+  m_PrefabInstance: {fileID: 3000473592672321048}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &6700992741654837911 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8457029684941735055, guid: 2d3a85ecde41a8246a79669975912b74,
     type: 3}
   m_PrefabInstance: {fileID: 3000473592672321048}
   m_PrefabAsset: {fileID: 0}
