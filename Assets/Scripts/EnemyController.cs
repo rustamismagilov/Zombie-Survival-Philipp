@@ -10,6 +10,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] float turnSpeed = 5f;
 
     NavMeshAgent navMeshAgent;
+    EnemyHealth enemyHealth;
 
     float distanceToTarget = Mathf.Infinity;
     bool isProvoked = false;
@@ -17,10 +18,17 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        enemyHealth = GetComponent<EnemyHealth>();
     }
 
     void Update()
     {
+        if (enemyHealth.IsDead())
+        {
+            enabled = false;
+            navMeshAgent.enabled = false;
+        }
+
         distanceToTarget = Vector3.Distance(target.position, transform.position);
 
         if (isProvoked)
@@ -72,5 +80,10 @@ public class EnemyController : MonoBehaviour
         Vector3 direction = (target.position - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * turnSpeed);
+    }
+
+    public void OnDamageTaken()
+    {
+        isProvoked = true;
     }
 }
