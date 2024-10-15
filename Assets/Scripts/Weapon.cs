@@ -14,8 +14,24 @@ public class Weapon : MonoBehaviour
     [SerializeField] float timeBetweenShots = 0.5f;
     [SerializeField] AmmoType ammoType;
     [SerializeField] TextMeshProUGUI ammoText;
-    
+
     public bool canShoot = true;
+
+    Animator animator;
+
+    public enum WeaponType
+    {
+        Pistol,
+        SMG,
+        ShotGun
+    }
+
+    public WeaponType weaponType;
+
+    void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
 
     private void OnEnable()
     {
@@ -39,7 +55,21 @@ public class Weapon : MonoBehaviour
         if (ammoSlot.GetCurrentAmmo(ammoType) > 0)
         {
             PlayMuzzleFlash();
-            ProcessRaycast();
+
+            switch (weaponType)
+            {
+                case WeaponType.Pistol:
+                    ProcessRaycast();
+                    animator.SetTrigger("Shoot");
+                    break;
+                case WeaponType.SMG:
+                    ProcessRaycast();
+                    animator.SetBool("isShooting", true);
+                    break;
+                case WeaponType.ShotGun:
+                    ProcessRaycast();
+                    break;
+            }
             ammoSlot.ReduceCurrentAmmo(ammoType);
             Debug.Log("Ammo " + ammoSlot.GetCurrentAmmo(ammoType));
         }
