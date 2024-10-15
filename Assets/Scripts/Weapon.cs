@@ -14,9 +14,12 @@ public class Weapon : MonoBehaviour
     [SerializeField] float timeBetweenShots = 0.5f;
     [SerializeField] AmmoType ammoType;
     [SerializeField] TextMeshProUGUI ammoText;
+    [SerializeField] int pelletsAmount = 10;
+    [SerializeField] float bulletSpread = 0.1f;
 
     public bool canShoot = true;
 
+    
     Animator animator;
 
     public enum WeaponType
@@ -46,6 +49,11 @@ public class Weapon : MonoBehaviour
         {
             StartCoroutine(Shoot());
         }
+
+        if (Input.GetMouseButtonUp(0) && weaponType == WeaponType.SMG)
+        {
+            animator.SetBool("isShooting", false);
+        }
     }
 
     IEnumerator Shoot()
@@ -67,7 +75,11 @@ public class Weapon : MonoBehaviour
                     animator.SetBool("isShooting", true);
                     break;
                 case WeaponType.ShotGun:
-                    ProcessRaycast();
+                    animator.SetTrigger("Shoot");
+                    for (int i = 0; i < pelletsAmount; i++)
+                    {
+                        ProcessRaycast();
+                    }
                     break;
             }
             ammoSlot.ReduceCurrentAmmo(ammoType);
@@ -81,6 +93,9 @@ public class Weapon : MonoBehaviour
     {
         RaycastHit hit;
 
+        Vector3 direction = GetShotgunSpread();
+
+        Debug.DrawRay(FPCamera.transform.position, direction * range, Color.red, 5f);
 
         if (Physics.Raycast(FPCamera.transform.position, FPCamera.transform.forward, out hit, range))
         {
@@ -118,5 +133,13 @@ public class Weapon : MonoBehaviour
     {
         int currentAmmo = ammoSlot.GetCurrentAmmo(ammoType);
         ammoText.text = currentAmmo.ToString();
+    }
+
+    Vector3 GetShotgunSpread()
+    {
+        Vector3 direction = FPCamera.transform.forward;
+        direction.x += Random.Range(-bulletSpread, bulletSpread);
+        direction.y += Random.Range(-bulletSpread, bulletSpread);
+        return direction;
     }
 }

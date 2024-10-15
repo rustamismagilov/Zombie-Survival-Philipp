@@ -10,6 +10,7 @@ public class EnemyHealth : MonoBehaviour
     float delayBeforeDeletion = 5f;
 
     EnemyController enemyController;
+    
 
     public bool IsDead()
     {
@@ -36,5 +37,6 @@ public class EnemyHealth : MonoBehaviour
 
         GetComponent<Animator>().SetTrigger("Death");
         enemyController.enabled = false;
-        GetComponent<CapsuleCollider>().enabled = false;    }
+        GetComponent<CapsuleCollider>().enabled = false;
+    }
 }
