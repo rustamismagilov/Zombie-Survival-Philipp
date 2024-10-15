@@ -1,23 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyHealth : MonoBehaviour
 {
     [SerializeField] float hitPoints = 100f;
 
-    bool isDead = false;
-    float delayBeforeDeletion = 5f;
+    NavMeshAgent navMeshAgent;
 
-    EnemyController enemyController;
-    
+    bool isDead = false;
+
+    void Start()
+    {
+        navMeshAgent = GetComponent<NavMeshAgent>();
+    }
 
     public bool IsDead()
     {
         return isDead;
     }
 
-    public void takeDamage(float damage)
+    public void TakeDamage(float damage)
     {
         BroadcastMessage("OnDamageTaken");
 
@@ -29,14 +33,18 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    void Die()
+    public void Die()
     {
         if (isDead) return;
 
         isDead = true;
 
+        navMeshAgent.enabled = false;
+
         GetComponent<Animator>().SetTrigger("Death");
-        enemyController.enabled = false;
+
         GetComponent<CapsuleCollider>().enabled = false;
+
+        Destroy(gameObject, 3f);
     }
 }
