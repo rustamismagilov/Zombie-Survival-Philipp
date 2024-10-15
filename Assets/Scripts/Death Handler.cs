@@ -22,5 +22,6 @@ public class DeathHandler : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         playerController.enabled = false;
+        weapon.canShoot = false;
     }
 }

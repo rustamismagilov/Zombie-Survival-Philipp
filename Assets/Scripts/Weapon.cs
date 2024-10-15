@@ -15,7 +15,7 @@ public class Weapon : MonoBehaviour
     [SerializeField] AmmoType ammoType;
     [SerializeField] TextMeshProUGUI ammoText;
     
-    bool canShoot = true;
+    public bool canShoot = true;
 
     private void OnEnable()
     {
