@@ -99,7 +99,7 @@ public class Weapon : MonoBehaviour
 
         if (Physics.Raycast(FPCamera.transform.position, FPCamera.transform.forward, out hit, range))
         {
-            Debug.Log("I hit this thing: " + hit.transform.name);
+            //Debug.Log("I hit this thing: " + hit.transform.name);
 
             CreateImpactHit(hit);
 
@@ -110,7 +110,7 @@ public class Weapon : MonoBehaviour
                 return;
             }
 
-            target.takeDamage(damage);
+            target.TakeDamage(damage);
         }
         else
         {

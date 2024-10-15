@@ -12,7 +12,6 @@ public class EnemyController : MonoBehaviour
     EnemyHealth enemyHealth;
     Transform target;
 
-
     float distanceToTarget = Mathf.Infinity;
     bool isProvoked = false;
 
@@ -27,8 +26,8 @@ public class EnemyController : MonoBehaviour
     {
         if (enemyHealth.IsDead())
         {
-            enabled = false;
-            navMeshAgent.enabled = false;
+            enemyHealth.Die();
+            return;
         }
 
         distanceToTarget = Vector3.Distance(target.position, transform.position);
@@ -46,7 +45,6 @@ public class EnemyController : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-
         Gizmos.DrawWireSphere(transform.position, chaseRange);
     }
 
@@ -54,7 +52,7 @@ public class EnemyController : MonoBehaviour
     {
         FaceTarget();
 
-        if (distanceToTarget >= navMeshAgent.stoppingDistance)
+        if (distanceToTarget >= navMeshAgent.stoppingDistance && navMeshAgent.enabled)
         {
             ChaseTarget();
         }
@@ -67,6 +65,8 @@ public class EnemyController : MonoBehaviour
 
     void ChaseTarget()
     {
+        if (!navMeshAgent.enabled) return;
+
         GetComponent<Animator>().SetBool("Attack", false);
         GetComponent<Animator>().SetTrigger("Move");
         navMeshAgent.SetDestination(target.position);
