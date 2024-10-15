@@ -16,10 +16,14 @@ public class Weapon : MonoBehaviour
     [SerializeField] TextMeshProUGUI ammoText;
     [SerializeField] int pelletsAmount = 10;
     [SerializeField] float bulletSpread = 0.1f;
+    [SerializeField] AudioClip pistolShootSFX;
+    [SerializeField] AudioClip emptyGunSFX;
+
+    AudioSource audiosource;
 
     public bool canShoot = true;
 
-    
+
     Animator animator;
 
     public enum WeaponType
@@ -34,6 +38,7 @@ public class Weapon : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
+        audiosource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -64,11 +69,13 @@ public class Weapon : MonoBehaviour
         {
             PlayMuzzleFlash();
 
+
             switch (weaponType)
             {
                 case WeaponType.Pistol:
                     ProcessRaycast();
                     animator.SetTrigger("Shoot");
+                    audiosource.PlayOneShot(pistolShootSFX);
                     break;
                 case WeaponType.SMG:
                     ProcessRaycast();
@@ -85,6 +92,11 @@ public class Weapon : MonoBehaviour
             ammoSlot.ReduceCurrentAmmo(ammoType);
             Debug.Log("Ammo " + ammoSlot.GetCurrentAmmo(ammoType));
         }
+        else
+        {
+            audiosource.PlayOneShot(emptyGunSFX);
+        }
+
         yield return new WaitForSeconds(timeBetweenShots);
         canShoot = true;
     }

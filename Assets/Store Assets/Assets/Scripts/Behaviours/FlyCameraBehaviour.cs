@@ -14,6 +14,7 @@ public class FlyCameraBehaviour : MonoBehaviour
     private float rotationX = 0.0f;
     private float rotationY = 0.0f;
 
+    [System.Obsolete]
     void Start()
 
     {
