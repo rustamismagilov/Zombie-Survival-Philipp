@@ -16,13 +16,21 @@ public class Weapon : MonoBehaviour
     [SerializeField] TextMeshProUGUI ammoText;
     [SerializeField] int pelletsAmount = 10;
     [SerializeField] float bulletSpread = 0.1f;
+    [SerializeField] AudioSource audiosource;
+
+    [Header("Gun sounds")]
     [SerializeField] AudioClip pistolShootSFX;
     [SerializeField] AudioClip emptyGunSFX;
 
-    AudioSource audiosource;
+    [Header("SMG sounds")]
+    [SerializeField] AudioClip smgShootSFX;
+    [SerializeField] AudioClip emptySmgSFX;
 
-    public bool canShoot = true;
+    [Header("Shotgun sounds")]
+    [SerializeField] AudioClip shotgunShootSFX;
+    [SerializeField] AudioClip emptyShotgunSFX;
 
+    [HideInInspector] public bool canShoot = true;
 
     Animator animator;
 
@@ -38,10 +46,15 @@ public class Weapon : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        audiosource = GetComponent<AudioSource>();
+
+        if (audiosource != null)
+        {
+            audiosource = GetComponentInParent<AudioSource>();
+        }
     }
 
-    private void OnEnable()
+
+    void OnEnable()
     {
         canShoot = true;
     }
@@ -55,51 +68,87 @@ public class Weapon : MonoBehaviour
             StartCoroutine(Shoot());
         }
 
-        if (Input.GetMouseButtonUp(0) && weaponType == WeaponType.SMG)
-        {
-            animator.SetBool("isShooting", false);
-        }
+        DisableAnimations();
     }
 
     IEnumerator Shoot()
     {
         canShoot = false;
 
-        if (ammoSlot.GetCurrentAmmo(ammoType) > 0)
+        int currentAmmo = ammoSlot.GetCurrentAmmo(ammoType);
+
+        switch (weaponType)
         {
-            PlayMuzzleFlash();
-
-
-            switch (weaponType)
-            {
-                case WeaponType.Pistol:
+            case WeaponType.Pistol:
+                if (currentAmmo > 0)
+                {
+                    PlayMuzzleFlash();
                     ProcessRaycast();
                     animator.SetTrigger("Shoot");
                     audiosource.PlayOneShot(pistolShootSFX);
-                    break;
-                case WeaponType.SMG:
+                    ammoSlot.ReduceCurrentAmmo(ammoType);
+                }
+                else
+                {
+                    audiosource.PlayOneShot(emptyGunSFX);
+                }
+                break;
+
+            case WeaponType.SMG:
+                if (currentAmmo > 0)
+                {
+                    PlayMuzzleFlash();
                     ProcessRaycast();
                     animator.SetBool("isShooting", true);
-                    break;
-                case WeaponType.ShotGun:
+                    audiosource.PlayOneShot(smgShootSFX);
+                    ammoSlot.ReduceCurrentAmmo(ammoType);
+                }
+                else
+                {
+                    audiosource.PlayOneShot(emptySmgSFX);
+                }
+                break;
+
+            case WeaponType.ShotGun:
+                if (currentAmmo > 0)
+                {
+                    PlayMuzzleFlash();
                     animator.SetTrigger("Shoot");
+                    audiosource.PlayOneShot(shotgunShootSFX);
                     for (int i = 0; i < pelletsAmount; i++)
                     {
                         ProcessRaycast();
                     }
-                    break;
-            }
-            ammoSlot.ReduceCurrentAmmo(ammoType);
-            Debug.Log("Ammo " + ammoSlot.GetCurrentAmmo(ammoType));
-        }
-        else
-        {
-            audiosource.PlayOneShot(emptyGunSFX);
+                    ammoSlot.ReduceCurrentAmmo(ammoType);
+                }
+                else
+                {
+                    audiosource.PlayOneShot(emptyShotgunSFX);
+                }
+                break;
+            
+            // You can probably use something like this instead of "else" in each switch case
+
+            /*default:
+                if (WeaponType.Pistol)
+                {
+                    audiosource.PlayOneShot(emptyGunSFX);
+                }
+                else if (WeaponType.SMG)
+                {
+                    audiosource.PlayOneShot(emptyGunSFX);
+                }
+                else if (WeaponType.ShotGun)
+                {
+                    audiosource.PlayOneShot(emptyGunSFX);
+                }
+                break;*/
         }
 
         yield return new WaitForSeconds(timeBetweenShots);
         canShoot = true;
     }
+
 
     void ProcessRaycast()
     {
@@ -153,5 +202,18 @@ public class Weapon : MonoBehaviour
         direction.x += Random.Range(-bulletSpread, bulletSpread);
         direction.y += Random.Range(-bulletSpread, bulletSpread);
         return direction;
+    }
+
+    void DisableAnimations()
+    {
+        if (Input.GetMouseButtonUp(0) && weaponType == WeaponType.SMG)
+        {
+            animator.SetBool("isShooting", false);
+        }
+
+        /* else if (Input.GetMouseButtonUp(0) && weaponType == WeaponType.Shotgun)
+        {
+            animator.SetBool("isShotgunShooting", false);
+        } */
     }
 }
