@@ -140,7 +140,7 @@ public class EnemyController : MonoBehaviour
         {
             navMeshAgent.isStopped = false;
             navMeshAgent.SetDestination(investigationPoint);
-            GetComponent<Animator>().SetTrigger("Move");
+            animator.SetBool("isMoving", true);
         }
 
         /*Trigger Investigation Animation (maybe later)
