@@ -279,6 +279,7 @@ public class Weapon : MonoBehaviour
                     FPCamera.transform.localPosition.x,
                     originalCameraHeight - (originalHeight - crouchHeight) / 2,
                     FPCamera.transform.localPosition.z);
+                Debug.Log("Is Crouching");
             }
             else
             {
@@ -289,6 +290,7 @@ public class Weapon : MonoBehaviour
                     FPCamera.transform.localPosition.x,
                     originalCameraHeight,
                     FPCamera.transform.localPosition.z);
+                Debug.Log("Is NOT Crouching");
             }
         }
     }

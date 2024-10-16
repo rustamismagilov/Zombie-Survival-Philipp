@@ -18,17 +18,22 @@ public class EnemyController : MonoBehaviour
     [SerializeField] float chaseRange = 10f;
     [SerializeField] float turnSpeed = 5f;
 
+    [Header("Field of View Settings")]
+    [SerializeField] float viewRadius = 15;
+    [Range(0, 360)]
+    [SerializeField] float viewAngle = 110;
+
+    [SerializeField] LayerMask targetMask;
+    [SerializeField] LayerMask obstacleMask;
+
     NavMeshAgent navMeshAgent;
     Animator animator;
     EnemyHealth enemyHealth;
     Transform target;
 
     float distanceToTarget = Mathf.Infinity;
-    bool isProvoked = false;
 
     private Vector3 investigationPoint;
-    private float investigationTimer = 0f;
-    private float maxInvestigationTime = 5f;
 
     void Start()
     {
@@ -52,7 +57,7 @@ public class EnemyController : MonoBehaviour
         switch (currentState)
         {
             case EnemyState.Idle:
-                if (distanceToTarget <= chaseRange)
+                if (CanSeePlayer())
                 {
                     currentState = EnemyState.Chasing;
                 }
@@ -97,32 +102,45 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    bool CanSeePlayer()
+    {
+        if (enemyHealth.IsDead()) return false;
+
+        if (distanceToTarget <= viewRadius)
+        {
+            Vector3 directionToTarget = (target.position - transform.position).normalized;
+
+            float angleBetweenEnemyAndTarget = Vector3.Angle(transform.forward, directionToTarget);
+
+            if (angleBetweenEnemyAndTarget <= viewAngle / 2)
+            {
+                if(!Physics.Linecast(transform.position + Vector3.up * 3f, 
+                    target.position + Vector3.up * 3f, obstacleMask))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     void InvestigateBehaviour()
     {
         if (navMeshAgent.enabled)
         {
-            if (navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+            if (!navMeshAgent.pathPending&&
+                navMeshAgent.remainingDistance<=navMeshAgent.stoppingDistance)
             {
-                navMeshAgent.SetDestination(investigationPoint);
-                animator.SetBool("isMoving", true);
+                navMeshAgent.isStopped = true;
             }
             else
             {
                 navMeshAgent.isStopped = true;
-                animator.SetBool("isMoving", false);
-
-                investigationTimer += Time.deltaTime;
-
+                navMeshAgent.SetDestination(investigationPoint);
                 //Space for investigation animation
-
-                if (investigationTimer >= maxInvestigationTime)
-                {
-                    navMeshAgent.isStopped = false;
-                    currentState = EnemyState.Idle;
-                }
             }
         }
-        if (distanceToTarget <= chaseRange)
+        if (CanSeePlayer())
         {
             currentState = EnemyState.Chasing;
         }
@@ -134,7 +152,6 @@ public class EnemyController : MonoBehaviour
 
         investigationPoint = point;
         currentState = EnemyState.Investigating;
-        investigationTimer = 0f;
 
         if (navMeshAgent.enabled)
         {

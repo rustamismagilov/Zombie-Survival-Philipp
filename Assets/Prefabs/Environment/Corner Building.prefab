@@ -96,14 +96,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: -838753863147071707}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64ea61dedaa3d004badaa5d66ee56c3a,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5314803307538568378}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64ea61dedaa3d004badaa5d66ee56c3a,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5598724293921479679}
   m_SourcePrefab: {fileID: 100100000, guid: 64ea61dedaa3d004badaa5d66ee56c3a, type: 3}
 --- !u!1 &878758448379569596 stripped
 GameObject:
@@ -112,50 +104,6 @@ GameObject:
   m_PrefabInstance: {fileID: 67716682453653741}
   m_PrefabAsset: {fileID: 0}
 --- !u!64 &-838753863147071707
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 878758448379569596}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -2050037929181851283, guid: 64ea61dedaa3d004badaa5d66ee56c3a, type: 3}
---- !u!64 &5314803307538568378
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 878758448379569596}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -2050037929181851283, guid: 64ea61dedaa3d004badaa5d66ee56c3a, type: 3}
---- !u!64 &5598724293921479679
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
