@@ -2,21 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Cinemachine;
 
 public class Weapon : MonoBehaviour
 {
     [SerializeField] Camera FPCamera;
-    [SerializeField] float range = 100f;
-    [SerializeField] float damage = 40;
+    [SerializeField] CinemachineVirtualCamera CVCamera;
     [SerializeField] ParticleSystem muzzleFlash;
     [SerializeField] GameObject impactEffect;
     [SerializeField] Ammo ammoSlot;
-    [SerializeField] float timeBetweenShots = 0.5f;
-    [SerializeField] AmmoType ammoType;
     [SerializeField] TextMeshProUGUI ammoText;
+    [SerializeField] AmmoType ammoType;
+    [SerializeField] float range = 100f;
+    [SerializeField] float damage = 40;
+    [SerializeField] float timeBetweenShots = 0.5f;
     [SerializeField] int pelletsAmount = 10;
     [SerializeField] float bulletSpread = 0.1f;
     [SerializeField] AudioSource audiosource;
+
+    [Header("Crouching")]
+    [SerializeField] float crouchHeight = 1.0f;
+    [SerializeField] float crouchSpeed = 2.0f;   
+    [SerializeField] float normalSpeed = 5.0f;
+    [SerializeField] float originalHeight = 1f;
+    [SerializeField] float originalCameraHeight = 1f;
+
+
 
     [Header("Gun sounds")]
     [SerializeField] AudioClip pistolShootSFX;
@@ -32,6 +43,11 @@ public class Weapon : MonoBehaviour
 
     [HideInInspector] public bool canShoot = true;
 
+    bool isCrouching = false;
+    Vector3 originalCenter;
+
+
+    CharacterController characterController;
     Animator animator;
 
     public enum WeaponType
@@ -46,10 +62,22 @@ public class Weapon : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
+        CVCamera = GetComponent<CinemachineVirtualCamera>();
 
         if (audiosource != null)
         {
             audiosource = GetComponentInParent<AudioSource>();
+        }
+
+        characterController = GetComponentInParent<CharacterController>();
+        if (characterController != null)
+        {
+            originalHeight = characterController.height;
+            originalCenter = characterController.center;
+        }
+        else
+        {
+            Debug.Log("CharacterController not found in Parent objects");
         }
     }
 
@@ -69,6 +97,7 @@ public class Weapon : MonoBehaviour
         }
 
         DisableAnimations();
+        Crouch();
     }
 
     IEnumerator Shoot()
@@ -126,23 +155,23 @@ public class Weapon : MonoBehaviour
                     audiosource.PlayOneShot(emptyShotgunSFX);
                 }
                 break;
-            
-            // You can probably use something like this instead of "else" in each switch case
 
-            /*default:
-                if (WeaponType.Pistol)
-                {
-                    audiosource.PlayOneShot(emptyGunSFX);
-                }
-                else if (WeaponType.SMG)
-                {
-                    audiosource.PlayOneShot(emptyGunSFX);
-                }
-                else if (WeaponType.ShotGun)
-                {
-                    audiosource.PlayOneShot(emptyGunSFX);
-                }
-                break;*/
+                // You can probably use something like this instead of "else" in each switch case
+
+                /*default:
+                    if (WeaponType.Pistol)
+                    {
+                        audiosource.PlayOneShot(emptyGunSFX);
+                    }
+                    else if (WeaponType.SMG)
+                    {
+                        audiosource.PlayOneShot(emptyGunSFX);
+                    }
+                    else if (WeaponType.ShotGun)
+                    {
+                        audiosource.PlayOneShot(emptyGunSFX);
+                    }
+                    break;*/
         }
 
         yield return new WaitForSeconds(timeBetweenShots);
@@ -215,5 +244,35 @@ public class Weapon : MonoBehaviour
         {
             animator.SetBool("isShotgunShooting", false);
         } */
+    }
+
+    void Crouch()
+    {
+        if (Input.GetKeyDown(KeyCode.C) && characterController != null)
+        {
+            isCrouching = !isCrouching;
+            
+
+            if (isCrouching)
+            {
+                characterController.height = crouchHeight;
+                characterController.center = new Vector3(0, crouchHeight / 2, 0);
+
+                FPCamera.transform.localPosition = new Vector3(
+                    FPCamera.transform.localPosition.x,
+                    originalCameraHeight - (originalHeight - crouchHeight) / 2,
+                    FPCamera.transform.localPosition.z);
+            }
+            else
+            {
+                characterController.height = originalHeight;
+                characterController.center = originalCenter;
+
+                FPCamera.transform.localPosition = new Vector3(
+                    FPCamera.transform.localPosition.x,
+                    originalCameraHeight,
+                    FPCamera.transform.localPosition.z);
+            }
+        }
     }
 }
