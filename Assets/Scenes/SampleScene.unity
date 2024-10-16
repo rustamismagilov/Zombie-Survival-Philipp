@@ -13247,6 +13247,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1911060661961386322, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
         type: 3}
+      propertyPath: range
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 1911060661961386322, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
+        type: 3}
       propertyPath: CVCamera
       value: 
       objectReference: {fileID: 1738647726}

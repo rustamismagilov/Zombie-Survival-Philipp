@@ -22,11 +22,10 @@ public class Weapon : MonoBehaviour
 
     [Header("Crouching")]
     [SerializeField] float crouchHeight = 1.0f;
-    [SerializeField] float crouchSpeed = 2.0f;   
+    [SerializeField] float crouchSpeed = 2.0f;
     [SerializeField] float normalSpeed = 5.0f;
     [SerializeField] float originalHeight = 1f;
     [SerializeField] float originalCameraHeight = 1f;
-
 
 
     [Header("Gun sounds")]
@@ -217,6 +216,24 @@ public class Weapon : MonoBehaviour
     {
         GameObject impact = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
         Destroy(impact, 0.1f);
+
+        AlertEnemies(hit.point);
+    }
+
+    void AlertEnemies(Vector3 impactPoint)
+    {
+        float alertRadius = 20f;
+
+        Collider[] colliders = Physics.OverlapSphere(impactPoint, alertRadius);
+
+        foreach (Collider collider in colliders)
+        {
+            EnemyController enemyController = collider.GetComponent<EnemyController>();
+            if (enemyController != null)
+            {
+                enemyController.InvestigateSound(impactPoint);
+            }
+        }
     }
 
     void DispalyAmmo()
@@ -251,7 +268,7 @@ public class Weapon : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C) && characterController != null)
         {
             isCrouching = !isCrouching;
-            
+
 
             if (isCrouching)
             {
