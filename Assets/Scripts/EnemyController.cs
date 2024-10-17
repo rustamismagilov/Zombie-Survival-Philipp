@@ -19,7 +19,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] float turnSpeed = 5f;
 
     [Header("Field of View Settings")]
-    [SerializeField] float viewRadius = 15;
+    [SerializeField] float viewRadius = 30;
     [Range(0, 360)]
     [SerializeField] float viewAngle = 110;
 
@@ -44,7 +44,6 @@ public class EnemyController : MonoBehaviour
         animator = GetComponent<Animator>();
         enemyHealth = GetComponent<EnemyHealth>();
         target = FindObjectOfType<PlayerHealth>().transform;
-
     }
 
     void Update()
@@ -93,7 +92,7 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
@@ -103,6 +102,12 @@ public class EnemyController : MonoBehaviour
             Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(investigationPoint, 0.5f);
         }
+
+        Vector3 viewAngleA = DirFromAngle(-viewAngle / 2, false);
+        Vector3 viewAngleB = DirFromAngle(viewAngle / 2, false);
+
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
     }
 
     bool CanSeePlayer()
@@ -174,8 +179,27 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    public void AlertToPlayer(Vector3 playerPosition)
+    {
+        if (enemyHealth.IsDead()) return;
+
+        currentState = EnemyState.Chasing;
+
+        if (navMeshAgent.enabled)
+        {
+            navMeshAgent.isStopped = false;
+            navMeshAgent.SetDestination(playerPosition);
+            animator.SetBool("isMoving", true);
+        }
+    }
+
     void EngageTarget()
     {
+        if (enemyHealth.IsDead())
+        {
+            return;
+        }
+
         FaceTarget();
 
         if (distanceToTarget > chaseRange)
@@ -235,5 +259,14 @@ public class EnemyController : MonoBehaviour
     public void OnDamageTaken()
     {
         currentState = EnemyState.Chasing;
+    }
+
+    Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
+    {
+        if (!angleIsGlobal)
+        {
+            angleInDegrees += transform.eulerAngles.y;
+        }
+        return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
     }
 }

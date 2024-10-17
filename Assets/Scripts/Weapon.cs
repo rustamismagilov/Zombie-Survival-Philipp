@@ -35,6 +35,8 @@ public class Weapon : MonoBehaviour
     [HideInInspector] public bool canShoot = true;
 
     Animator animator;
+    EnemyController enemyController;
+    EnemyHealth enemyHealth;
 
     public enum WeaponType
     {
@@ -48,6 +50,7 @@ public class Weapon : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
+        enemyController = GetComponent<EnemyController>();
 
 
         if (audiosource != null)
@@ -152,7 +155,6 @@ public class Weapon : MonoBehaviour
         canShoot = true;
     }
 
-
     void ProcessRaycast()
     {
         RaycastHit hit;
@@ -163,18 +165,25 @@ public class Weapon : MonoBehaviour
 
         if (Physics.Raycast(weaponCamera.transform.position, weaponCamera.transform.forward, out hit, range))
         {
-            //Debug.Log("I hit this thing: " + hit.transform.name);
-
             CreateImpactHit(hit);
 
             EnemyHealth target = hit.transform.GetComponent<EnemyHealth>();
 
-            if (target == null)
+            if (target != null)
             {
-                return;
+                target.TakeDamage(damage);
+                enemyController = hit.transform.GetComponent<EnemyController>();
+
+                if (enemyController == null)
+                {
+                    enemyController = hit.transform.GetComponent<EnemyController>();
+                }
+                if (enemyController != null)
+                {
+                    enemyController.AlertToPlayer(transform.position);
+                }
             }
 
-            target.TakeDamage(damage);
         }
         else
         {
@@ -206,10 +215,36 @@ public class Weapon : MonoBehaviour
         foreach (Collider collider in colliders)
         {
             EnemyController enemyController = collider.GetComponentInParent<EnemyController>();
-            
+
             if (enemyController != null)
             {
                 enemyController.InvestigateSound(impactPoint);
+            }
+        }
+    }
+    void AlertEnemiesNearTarget(Vector3 targetPosition, EnemyController shotEnemy)
+    {
+        float alertRadius = 15f; // Adjust this value as needed
+
+        Collider[] colliders = Physics.OverlapSphere(targetPosition, alertRadius);
+
+        foreach (Collider collider in colliders)
+        {
+            EnemyController enemyController = collider.GetComponent<EnemyController>();
+            if (enemyController == null)
+            {
+                // Try to get the EnemyController from the parent
+                enemyController = collider.GetComponentInParent<EnemyController>();
+            }
+
+            if (enemyController != null && !enemyHealth.IsDead())
+            {
+                // Exclude the enemy that was shot
+                if (enemyController != shotEnemy)
+                {
+                    // Alert the enemy to the player's position
+                    enemyController.AlertToPlayer(transform.position);
+                }
             }
         }
     }
@@ -240,4 +275,5 @@ public class Weapon : MonoBehaviour
             animator.SetBool("isShotgunShooting", false);
         } */
     }
+
 }
