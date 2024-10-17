@@ -11,9 +11,9 @@ public class DisplayDamage : MonoBehaviour
 
     void Start()
     {
-        foreach(var image in damageImages)
+        foreach (var image in damageImages)
         {
-            image.SetActive (false);
+            image.SetActive(false);
         }
     }
     public void ShowDamageImpact()
@@ -29,5 +29,4 @@ public class DisplayDamage : MonoBehaviour
         yield return new WaitForSeconds(impactTime);
         selectedImage.SetActive(false);
     }
-
 }

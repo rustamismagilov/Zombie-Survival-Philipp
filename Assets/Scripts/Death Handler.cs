@@ -8,11 +8,13 @@ public class DeathHandler : MonoBehaviour
     [SerializeField] Canvas gameOverCanvas;
     [SerializeField] PlayerController playerController;
     Weapon weapon;
+    WeaponSwitcher weaponSwitcher;
 
     void Start()
     {
         gameOverCanvas.enabled = false;
         weapon = FindObjectOfType<Weapon>();
+        weaponSwitcher = FindObjectOfType<WeaponSwitcher>();
     }
 
     public void HandleDeath()
@@ -22,6 +24,7 @@ public class DeathHandler : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         playerController.enabled = false;
-        weapon.canShoot = false;
+        weapon.enabled = false;
+        weaponSwitcher.enabled = false;
     }
 }

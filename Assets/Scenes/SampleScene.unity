@@ -1372,6 +1372,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Zombie (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7048540107467358049, guid: e7600e14eac15544c88e0673c83d9dd2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -13233,6 +13238,11 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2972091384165959763, guid: e7600e14eac15544c88e0673c83d9dd2,
+        type: 3}
+      propertyPath: targetMask.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5451256533701334266, guid: e7600e14eac15544c88e0673c83d9dd2,
         type: 3}
       propertyPath: target
@@ -13292,6 +13302,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Zombie
+      objectReference: {fileID: 0}
+    - target: {fileID: 7048540107467358049, guid: e7600e14eac15544c88e0673c83d9dd2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15052,11 +15067,36 @@ PrefabInstance:
       propertyPath: gameOverCanvas
       value: 
       objectReference: {fileID: 1066793447}
+    - target: {fileID: 5818741708593883595, guid: b3c43503033efba43b740bf6815b06fc,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 6527108578782800905, guid: b3c43503033efba43b740bf6815b06fc,
         type: 3}
       propertyPath: damageCanvas
       value: 
       objectReference: {fileID: 1434833899}
+    - target: {fileID: 6527108578782800905, guid: b3c43503033efba43b740bf6815b06fc,
+        type: 3}
+      propertyPath: damageImages.Array.data[0]
+      value: 
+      objectReference: {fileID: 1123330998}
+    - target: {fileID: 6527108578782800905, guid: b3c43503033efba43b740bf6815b06fc,
+        type: 3}
+      propertyPath: damageImages.Array.data[1]
+      value: 
+      objectReference: {fileID: 433069933}
+    - target: {fileID: 6527108578782800905, guid: b3c43503033efba43b740bf6815b06fc,
+        type: 3}
+      propertyPath: damageImages.Array.data[2]
+      value: 
+      objectReference: {fileID: 1813900087}
+    - target: {fileID: 6527108578782800905, guid: b3c43503033efba43b740bf6815b06fc,
+        type: 3}
+      propertyPath: damageImages.Array.data[3]
+      value: 
+      objectReference: {fileID: 563535385}
     - target: {fileID: 6998892279337776777, guid: b3c43503033efba43b740bf6815b06fc,
         type: 3}
       propertyPath: m_LocalPosition.x

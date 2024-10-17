@@ -1,3 +1,4 @@
+using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,190 +6,166 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
-    public enum EnemyState
-    {
-        Idle,
-        Chasing,
-        Attacking,
-        Investigating
-    }
-
-    private EnemyState currentState = EnemyState.Idle;
-
-    [SerializeField] float chaseRange = 10f;
+    [SerializeField] float chaseRange = 20f;
+    public float soundReactionRange = 10f;
     [SerializeField] float turnSpeed = 5f;
+    [SerializeField] float investigationTime = 5f; // How long zombie will investigate the impact
 
-    [Header("Field of View Settings")]
-    [SerializeField] float viewRadius = 15;
-    [Range(0, 360)]
-    [SerializeField] float viewAngle = 110;
-
-    [SerializeField] LayerMask targetMask;
-    [SerializeField] LayerMask obstacleMask;
-
-    [SerializeField] float maxInvestigationTime = 5f;
+    [SerializeField] float viewRadius = 21f; // Field of view radius.
+    [SerializeField] float viewAngle = 90f;  // Field of view angle (e.g., 90 degrees).
 
     NavMeshAgent navMeshAgent;
-    Animator animator;
     EnemyHealth enemyHealth;
     Transform target;
-
-    float investigationTimer = 0f;
     float distanceToTarget = Mathf.Infinity;
-
-    private Vector3 investigationPoint;
+    bool isProvoked = false;
+    bool isInvestigating = false;
+    Vector3 investigationPoint;
 
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();
         enemyHealth = GetComponent<EnemyHealth>();
         target = FindObjectOfType<PlayerHealth>().transform;
-
     }
 
     void Update()
     {
         if (enemyHealth.IsDead())
         {
-            navMeshAgent.enabled = false;
+            enemyHealth.Die();
             return;
         }
 
         distanceToTarget = Vector3.Distance(target.position, transform.position);
+        PlayerController playerController = target.GetComponent<PlayerController>();
 
-        switch (currentState)
+        // If the zombie is investigating a bullet impact, continue that first
+        if (isInvestigating)
         {
-            case EnemyState.Idle:
-                if (CanSeePlayer())
-                {
-                    currentState = EnemyState.Chasing;
-                }
-                break;
-
-            case EnemyState.Chasing:
-                EngageTarget();
-                break;
-
-            case EnemyState.Attacking:
-                EngageTarget();
-                break;
-
-            case EnemyState.Investigating:
-                InvestigateBehaviour();
-                break;
+            InvestigateImpact();
         }
-        SetMovementAnimation();
-    }
-
-    void SetMovementAnimation()
-    {
-        if (navMeshAgent.enabled && navMeshAgent.velocity.sqrMagnitude > 0.1)
+        else if (PlayerInFieldOfView()) // If the player is within the viewAngle
         {
-            animator.SetBool("isMoving", true);
+            // Engage if the player is within the viewAngle, no matter if standing, moving, or crouching
+            isProvoked = true;
         }
-        else
+        else if (distanceToTarget <= viewRadius) // If player is within viewRadius but NOT in viewAngle
         {
-            animator.SetBool("isMoving", false);
-        }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, chaseRange);
-
-        if (currentState == EnemyState.Investigating)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(investigationPoint, 0.5f);
-        }
-    }
-
-    bool CanSeePlayer()
-    {
-        if (enemyHealth.IsDead()) return false;
-
-        if (distanceToTarget <= viewRadius)
-        {
-            Vector3 directionToTarget = (target.position - transform.position).normalized;
-
-            float angleBetweenEnemyAndTarget = Vector3.Angle(transform.forward, directionToTarget);
-
-            if (angleBetweenEnemyAndTarget <= viewAngle / 2)
+            if (!playerController.isCrouching && playerController.IsMoving)
             {
-                if(!Physics.Linecast(transform.position + Vector3.up * 3f, 
-                    target.position + Vector3.up * 3f, obstacleMask))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    void InvestigateBehaviour()
-    {
-        if (navMeshAgent.enabled)
-        {
-            if (!navMeshAgent.pathPending&&
-                navMeshAgent.remainingDistance<=navMeshAgent.stoppingDistance)
-            {
-                navMeshAgent.isStopped = true;
-                animator.SetBool("isMoving", false);
-
-                investigationTimer += Time.deltaTime;
-            }
-            if (investigationTimer >= maxInvestigationTime)
-            {
-                navMeshAgent.isStopped = false;
-                currentState = EnemyState.Idle;
+                // Engage if the player is moving and not crouching in the viewRadius (but outside the viewAngle)
+                isProvoked = true;
             }
             else
             {
-                navMeshAgent.isStopped = false;
-                navMeshAgent.SetDestination(investigationPoint);
-                animator.SetBool("isMoving", true);
-                //Space for investigation animation
+                // Ignore if the player is standing still or crouching outside the viewAngle
+                isProvoked = false;
             }
         }
-        if (CanSeePlayer())
+        else
         {
-            currentState = EnemyState.Chasing;
+            // Player is outside viewRadius and not in viewAngle
+            isProvoked = false;
+        }
+
+        // Engage the player if provoked
+        if (isProvoked)
+        {
+            EngageTarget();
         }
     }
 
-    public void InvestigateSound(Vector3 point)
+    private void OnDrawGizmos()
     {
-        if (enemyHealth.IsDead()) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, chaseRange);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, soundReactionRange); // Visualize sound radius
 
-        investigationPoint = point;
-        currentState = EnemyState.Investigating;
-        investigationTimer = 0f;
 
-        if (navMeshAgent.enabled)
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, viewRadius);
+
+        Vector3 viewAngleA = DirFromAngle(-viewAngle / 2, false);
+        Vector3 viewAngleB = DirFromAngle(viewAngle / 2, false);
+
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
+    }
+
+    public void OnDamageTaken()
+    {
+        isProvoked = true; // Zombie gets provoked when taking damage
+        StopAllCoroutines(); // Stop any ongoing investigation
+        ChaseTarget(); // Engage the player
+
+        // Alert nearby zombies when this zombie is hit
+        AlertNearbyZombies();
+    }
+
+    void AlertNearbyZombies()
+    {
+        Collider[] nearbyZombies = Physics.OverlapSphere(transform.position, soundReactionRange);
+        foreach (Collider nearbyObject in nearbyZombies)
         {
-            navMeshAgent.isStopped = false;
-            navMeshAgent.SetDestination(investigationPoint);
-            animator.SetBool("isMoving", true);
+            EnemyController nearbyZombie = nearbyObject.GetComponent<EnemyController>();
+            if (nearbyZombie != null && !nearbyZombie.isProvoked)
+            {
+                nearbyZombie.isProvoked = true;
+            }
         }
+    }
+
+    public void Investigate(Vector3 impactPoint)
+    {
+        if (isProvoked) return; // If already provoked, don't investigate
+
+        StopAllCoroutines(); // Stop any ongoing investigations
+        investigationPoint = impactPoint;
+        isInvestigating = true;
+
+        navMeshAgent.SetDestination(investigationPoint);
+        GetComponent<Animator>().SetBool("isMoving", true); // Start Move animation
+    }
+
+    void InvestigateImpact()
+    {
+        // If the zombie has reached the investigation point
+        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        {
+            if (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f)
+            {
+                // Stop moving and play Idle animation
+                GetComponent<Animator>().SetBool("isMoving", false); // Stop Move animation
+                StartCoroutine(StopInvestigation());
+            }
+        }
+    }
+
+    IEnumerator StopInvestigation()
+    {
+        // Wait at the impact point for a bit
+        yield return new WaitForSeconds(investigationTime);
+
+        isInvestigating = false;
+
+        // Ensure the NavMeshAgent is stopped
+        navMeshAgent.ResetPath();
+
+        // The zombie remains idle after investigation
+        GetComponent<Animator>().SetBool("isMoving", false); // Ensure Move animation is stopped
     }
 
     void EngageTarget()
     {
         FaceTarget();
 
-        if (distanceToTarget > chaseRange)
-        {
-            navMeshAgent.isStopped = false;
-            currentState = EnemyState.Idle;
-            animator.SetBool("Attack", false);
-        }
-        else if (distanceToTarget > navMeshAgent.stoppingDistance)
+        if (distanceToTarget >= navMeshAgent.stoppingDistance && navMeshAgent.enabled)
         {
             ChaseTarget();
         }
-        else
+        else if (distanceToTarget <= navMeshAgent.stoppingDistance)
         {
             AttackTarget();
         }
@@ -197,32 +174,50 @@ public class EnemyController : MonoBehaviour
     void ChaseTarget()
     {
         if (!navMeshAgent.enabled) return;
-
-        animator.SetBool("Attack", false);
-        animator.SetBool("isMoving", true);
-        navMeshAgent.isStopped = false;
+        GetComponent<Animator>().SetBool("isMoving", true); // Start Move animation
         navMeshAgent.SetDestination(target.position);
-
-        currentState = EnemyState.Chasing;
     }
 
     void AttackTarget()
     {
-        if (distanceToTarget <= navMeshAgent.stoppingDistance)
-        {
-            navMeshAgent.isStopped = true;
-            animator.SetBool("isMoving", false);
-            animator.SetBool("Attack", true);
+        GetComponent<Animator>().SetBool("isMoving", false); // Stop Move animation
+        GetComponent<Animator>().SetTrigger("Attack");
+    }
 
-            currentState = EnemyState.Attacking;
-        }
-        else
-        {
-            animator.SetBool("Attack", false);
-            navMeshAgent.isStopped = false;
 
-            currentState = EnemyState.Chasing;
+    bool PlayerInFieldOfView()
+    {
+        // Perform an overlap sphere to find all colliders within the view radius
+        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius);
+
+        foreach (Collider targetCollider in targetsInViewRadius)
+        {
+            // Check if the collider has the "Player" tag
+            if (targetCollider.CompareTag("Player"))
+            {
+                Transform targetTransform = targetCollider.transform;
+                Vector3 directionToTarget = (targetTransform.position - transform.position).normalized;
+
+                // Calculate the angle between the zombie's forward direction and the direction to the target
+                float angleBetweenZombieAndTarget = Vector3.Angle(transform.forward, directionToTarget);
+
+                if (angleBetweenZombieAndTarget < viewAngle / 2f)
+                {
+                    // Optional: Perform a Linecast to check for obstacles between the zombie and the player
+                    if (!Physics.Linecast(transform.position, targetTransform.position, out RaycastHit hit))
+                    {
+                        // The player is within the cone of vision and there are no obstacles
+                        return true;
+                    }
+                    else if (hit.transform.CompareTag("Player"))
+                    {
+                        // The Linecast hit the player directly
+                        return true;
+                    }
+                }
+            }
         }
+        return false;
     }
 
     void FaceTarget()
@@ -232,8 +227,12 @@ public class EnemyController : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * turnSpeed);
     }
 
-    public void OnDamageTaken()
+    Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
     {
-        currentState = EnemyState.Chasing;
+        if (!angleIsGlobal)
+        {
+            angleInDegrees += transform.eulerAngles.y;
+        }
+        return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
     }
 }

@@ -41,6 +41,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 movementInput;
     private Vector3 smoothMoveVelocity;
 
+    public bool IsMoving
+    {
+        get
+        {
+            return movementInput.magnitude > 0.1f;
+        }
+    }
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();

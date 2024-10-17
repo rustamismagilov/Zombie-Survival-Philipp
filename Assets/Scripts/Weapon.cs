@@ -201,15 +201,13 @@ public class Weapon : MonoBehaviour
 
         Collider[] colliders = Physics.OverlapSphere(impactPoint, alertRadius);
 
-        Debug.Log("AlertEnemies called. Colliders found" + colliders.Length);
-
         foreach (Collider collider in colliders)
         {
             EnemyController enemyController = collider.GetComponentInParent<EnemyController>();
             
             if (enemyController != null)
             {
-                enemyController.InvestigateSound(impactPoint);
+                enemyController.Investigate(impactPoint);
             }
         }
     }
