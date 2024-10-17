@@ -23,6 +23,7 @@ public class FlyCameraBehaviour : MonoBehaviour
 
     }
 
+    [System.Obsolete]
     void Update()
 
     {

@@ -6,8 +6,7 @@ using Cinemachine;
 
 public class Weapon : MonoBehaviour
 {
-    [SerializeField] Camera FPCamera;
-    [SerializeField] CinemachineVirtualCamera CVCamera;
+    [SerializeField] Camera weaponCamera;
     [SerializeField] ParticleSystem muzzleFlash;
     [SerializeField] GameObject impactEffect;
     [SerializeField] Ammo ammoSlot;
@@ -19,13 +18,6 @@ public class Weapon : MonoBehaviour
     [SerializeField] int pelletsAmount = 10;
     [SerializeField] float bulletSpread = 0.1f;
     [SerializeField] AudioSource audiosource;
-
-    [Header("Crouching")]
-    [SerializeField] float crouchHeight = 1.0f;
-    [SerializeField] float crouchSpeed = 2.0f;
-    [SerializeField] float normalSpeed = 5.0f;
-    [SerializeField] float originalHeight = 1f;
-    [SerializeField] float originalCameraHeight = 1f;
 
 
     [Header("Gun sounds")]
@@ -42,11 +34,6 @@ public class Weapon : MonoBehaviour
 
     [HideInInspector] public bool canShoot = true;
 
-    bool isCrouching = false;
-    Vector3 originalCenter;
-
-
-    CharacterController characterController;
     Animator animator;
 
     public enum WeaponType
@@ -61,22 +48,11 @@ public class Weapon : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        CVCamera = GetComponent<CinemachineVirtualCamera>();
+
 
         if (audiosource != null)
         {
             audiosource = GetComponentInParent<AudioSource>();
-        }
-
-        characterController = GetComponentInParent<CharacterController>();
-        if (characterController != null)
-        {
-            originalHeight = characterController.height;
-            originalCenter = characterController.center;
-        }
-        else
-        {
-            Debug.Log("CharacterController not found in Parent objects");
         }
     }
 
@@ -96,7 +72,6 @@ public class Weapon : MonoBehaviour
         }
 
         DisableAnimations();
-        Crouch();
     }
 
     IEnumerator Shoot()
@@ -184,9 +159,9 @@ public class Weapon : MonoBehaviour
 
         Vector3 direction = GetShotgunSpread();
 
-        Debug.DrawRay(FPCamera.transform.position, direction * range, Color.red, 5f);
+        Debug.DrawRay(weaponCamera.transform.position, direction * range, Color.red, 5f);
 
-        if (Physics.Raycast(FPCamera.transform.position, FPCamera.transform.forward, out hit, range))
+        if (Physics.Raycast(weaponCamera.transform.position, weaponCamera.transform.forward, out hit, range))
         {
             //Debug.Log("I hit this thing: " + hit.transform.name);
 
@@ -226,9 +201,12 @@ public class Weapon : MonoBehaviour
 
         Collider[] colliders = Physics.OverlapSphere(impactPoint, alertRadius);
 
+        Debug.Log("AlertEnemies called. Colliders found" + colliders.Length);
+
         foreach (Collider collider in colliders)
         {
-            EnemyController enemyController = collider.GetComponent<EnemyController>();
+            EnemyController enemyController = collider.GetComponentInParent<EnemyController>();
+            
             if (enemyController != null)
             {
                 enemyController.InvestigateSound(impactPoint);
@@ -244,7 +222,7 @@ public class Weapon : MonoBehaviour
 
     Vector3 GetShotgunSpread()
     {
-        Vector3 direction = FPCamera.transform.forward;
+        Vector3 direction = weaponCamera.transform.forward;
         direction.x += Random.Range(-bulletSpread, bulletSpread);
         direction.y += Random.Range(-bulletSpread, bulletSpread);
         return direction;
@@ -261,37 +239,5 @@ public class Weapon : MonoBehaviour
         {
             animator.SetBool("isShotgunShooting", false);
         } */
-    }
-
-    void Crouch()
-    {
-        if (Input.GetKeyDown(KeyCode.C) && characterController != null)
-        {
-            isCrouching = !isCrouching;
-
-
-            if (isCrouching)
-            {
-                characterController.height = crouchHeight;
-                characterController.center = new Vector3(0, crouchHeight / 2, 0);
-
-                FPCamera.transform.localPosition = new Vector3(
-                    FPCamera.transform.localPosition.x,
-                    originalCameraHeight - (originalHeight - crouchHeight) / 2,
-                    FPCamera.transform.localPosition.z);
-                Debug.Log("Is Crouching");
-            }
-            else
-            {
-                characterController.height = originalHeight;
-                characterController.center = originalCenter;
-
-                FPCamera.transform.localPosition = new Vector3(
-                    FPCamera.transform.localPosition.x,
-                    originalCameraHeight,
-                    FPCamera.transform.localPosition.z);
-                Debug.Log("Is NOT Crouching");
-            }
-        }
     }
 }

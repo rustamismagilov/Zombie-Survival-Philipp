@@ -6,7 +6,7 @@ using UnityEngine;
 public class DeathHandler : MonoBehaviour
 {
     [SerializeField] Canvas gameOverCanvas;
-    [SerializeField] FirstPersonController playerController;
+    [SerializeField] PlayerController playerController;
     Weapon weapon;
 
     void Start()

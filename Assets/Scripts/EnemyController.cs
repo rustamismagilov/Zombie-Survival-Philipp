@@ -132,11 +132,13 @@ public class EnemyController : MonoBehaviour
                 navMeshAgent.remainingDistance<=navMeshAgent.stoppingDistance)
             {
                 navMeshAgent.isStopped = true;
+                animator.SetBool("isMoving", false);
             }
             else
             {
                 navMeshAgent.isStopped = true;
                 navMeshAgent.SetDestination(investigationPoint);
+                animator.SetBool("isMoving", true);
                 //Space for investigation animation
             }
         }
@@ -148,7 +150,13 @@ public class EnemyController : MonoBehaviour
 
     public void InvestigateSound(Vector3 point)
     {
-        if (enemyHealth.IsDead()) return;
+        if (enemyHealth.IsDead())
+        {
+            Debug.Log(gameObject.name + " is dead and cannot investigate.");
+            return;
+        }
+
+        Debug.Log(gameObject.name + " is investigating point: " + point);
 
         investigationPoint = point;
         currentState = EnemyState.Investigating;
@@ -159,9 +167,6 @@ public class EnemyController : MonoBehaviour
             navMeshAgent.SetDestination(investigationPoint);
             animator.SetBool("isMoving", true);
         }
-
-        /*Trigger Investigation Animation (maybe later)
-         GetComponent<Animator>().SetTrigger("Investigate")*/
     }
 
     void EngageTarget()
