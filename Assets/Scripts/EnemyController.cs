@@ -26,11 +26,14 @@ public class EnemyController : MonoBehaviour
     [SerializeField] LayerMask targetMask;
     [SerializeField] LayerMask obstacleMask;
 
+    [SerializeField] float maxInvestigationTime = 5f;
+
     NavMeshAgent navMeshAgent;
     Animator animator;
     EnemyHealth enemyHealth;
     Transform target;
 
+    float investigationTimer = 0f;
     float distanceToTarget = Mathf.Infinity;
 
     private Vector3 investigationPoint;
@@ -133,10 +136,17 @@ public class EnemyController : MonoBehaviour
             {
                 navMeshAgent.isStopped = true;
                 animator.SetBool("isMoving", false);
+
+                investigationTimer += Time.deltaTime;
+            }
+            if (investigationTimer >= maxInvestigationTime)
+            {
+                navMeshAgent.isStopped = false;
+                currentState = EnemyState.Idle;
             }
             else
             {
-                navMeshAgent.isStopped = true;
+                navMeshAgent.isStopped = false;
                 navMeshAgent.SetDestination(investigationPoint);
                 animator.SetBool("isMoving", true);
                 //Space for investigation animation
@@ -150,16 +160,11 @@ public class EnemyController : MonoBehaviour
 
     public void InvestigateSound(Vector3 point)
     {
-        if (enemyHealth.IsDead())
-        {
-            Debug.Log(gameObject.name + " is dead and cannot investigate.");
-            return;
-        }
-
-        Debug.Log(gameObject.name + " is investigating point: " + point);
+        if (enemyHealth.IsDead()) return;
 
         investigationPoint = point;
         currentState = EnemyState.Investigating;
+        investigationTimer = 0f;
 
         if (navMeshAgent.enabled)
         {
