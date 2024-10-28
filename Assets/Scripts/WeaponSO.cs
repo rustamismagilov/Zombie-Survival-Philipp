@@ -1,18 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Weapom Type", fileName = "Weapon 1")]
+[CreateAssetMenu(fileName = "New Weapon", menuName = "Weapons/WeaponSO")]
 public class WeaponSO : ScriptableObject
 {
-    public float range = 100f;
-    public float damage = 40;
-    public float timeBetweenShots = 0.5f;
-    public int pelletsAmount = 10;
+    public enum WeaponType
+    {
+        Pistol,
+        SMG,
+        Shotgun
+    }
 
-    [Tooltip("Randomized audio clips for shooting sound")]
+    public WeaponType weaponType;
+    public float range = 100f;
+    public float damage = 40f;
+    public float timeBetweenShots = 0.5f;
+    public int pelletsAmount = 1;
+    public float bulletSpread = 0.1f;
+
+    [Header("Shooting Sounds")]
     public AudioClip[] shootSFX;
 
-    [Tooltip("Randomized audio clips for empty weapon sound")]
-    public AudioClip[] emptySFX;
+    [Header("Empty Weapon Sounds")]
+    public AudioClip[] emptyShootSFX;
 }

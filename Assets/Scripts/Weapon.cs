@@ -1,75 +1,45 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using Cinemachine;
 
 public class Weapon : MonoBehaviour
 {
-    [SerializeField] Camera weaponCamera;
-    [SerializeField] ParticleSystem muzzleFlash;
-    [SerializeField] GameObject impactEffect;
-    [SerializeField] Ammo ammoSlot;
-    [SerializeField] TextMeshProUGUI ammoText;
-    [SerializeField] AmmoType ammoType;
-    [SerializeField] float range = 100f;
-    [SerializeField] float damage = 40;
-    [SerializeField] float timeBetweenShots = 0.5f;
-    [SerializeField] int pelletsAmount = 10;
-    [SerializeField] float bulletSpread = 0.1f;
-    [SerializeField] AudioSource audiosource;
-
-
-    [Header("Gun sounds")]
-    [SerializeField] AudioClip pistolShootSFX;
-    [SerializeField] AudioClip emptyGunSFX;
-
-    [Header("SMG sounds")]
-    [SerializeField] AudioClip smgShootSFX;
-    [SerializeField] AudioClip emptySmgSFX;
-
-    [Header("Shotgun sounds")]
-    [SerializeField] AudioClip shotgunShootSFX;
-    [SerializeField] AudioClip emptyShotgunSFX;
+    [SerializeField] private Camera weaponCamera;
+    [SerializeField] private ParticleSystem muzzleFlash;
+    [SerializeField] private GameObject impactEffect;
+    [SerializeField] private Ammo ammoSlot;
+    [SerializeField] private TextMeshProUGUI ammoText;
+    [SerializeField] private AmmoType ammoType;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private WeaponSO weaponData; // Reference to WeaponSO
 
     [HideInInspector] public bool canShoot = true;
 
-    Animator animator;
-    EnemyController enemyController;
-    EnemyHealth enemyHealth;
+    private Animator animator;
+    private EnemyController enemyController;
+    private EnemyHealth enemyHealth;
 
-    public enum WeaponType
-    {
-        Pistol,
-        SMG,
-        ShotGun
-    }
-
-    public WeaponType weaponType;
-
-    void Start()
+    private void Start()
     {
         animator = GetComponent<Animator>();
         enemyController = GetComponent<EnemyController>();
 
-
-        if (audiosource != null)
+        if (audioSource == null)
         {
-            audiosource = GetComponentInParent<AudioSource>();
+            audioSource = GetComponentInParent<AudioSource>();
         }
     }
 
-
-    void OnEnable()
+    private void OnEnable()
     {
         canShoot = true;
     }
 
-    void Update()
+    private void Update()
     {
-        DispalyAmmo();
+        DisplayAmmo();
 
-        if (Input.GetMouseButtonDown(0) && canShoot == true)
+        if (Input.GetMouseButtonDown(0) && canShoot)
         {
             StartCoroutine(Shoot());
         }
@@ -77,197 +47,142 @@ public class Weapon : MonoBehaviour
         DisableAnimations();
     }
 
-    IEnumerator Shoot()
+    private IEnumerator Shoot()
     {
         canShoot = false;
-
         int currentAmmo = ammoSlot.GetCurrentAmmo(ammoType);
 
-        switch (weaponType)
+        if (currentAmmo > 0)
         {
-            case WeaponType.Pistol:
-                if (currentAmmo > 0)
-                {
-                    PlayMuzzleFlash();
-                    ProcessRaycast();
-                    animator.SetTrigger("Shoot");
-                    audiosource.PlayOneShot(pistolShootSFX);
-                    ammoSlot.ReduceCurrentAmmo(ammoType);
-                }
-                else
-                {
-                    audiosource.PlayOneShot(emptyGunSFX);
-                }
-                break;
+            PlayMuzzleFlash();
+            PlayRandomAudioClip(weaponData.shootSFX);
 
-            case WeaponType.SMG:
-                if (currentAmmo > 0)
-                {
-                    PlayMuzzleFlash();
-                    ProcessRaycast();
-                    animator.SetBool("isShooting", true);
-                    audiosource.PlayOneShot(smgShootSFX);
-                    ammoSlot.ReduceCurrentAmmo(ammoType);
-                }
-                else
-                {
-                    audiosource.PlayOneShot(emptySmgSFX);
-                }
-                break;
+            if (weaponData.weaponType == WeaponSO.WeaponType.SMG)
+            {
+                animator.SetBool("isShooting", true);
+            }
+            else
+            {
+                animator.SetTrigger("Shoot");
+            }
 
-            case WeaponType.ShotGun:
-                if (currentAmmo > 0)
+            if (weaponData.weaponType == WeaponSO.WeaponType.Shotgun)
+            {
+                for (int i = 0; i < weaponData.pelletsAmount; i++)
                 {
-                    PlayMuzzleFlash();
-                    animator.SetTrigger("Shoot");
-                    audiosource.PlayOneShot(shotgunShootSFX);
-                    for (int i = 0; i < pelletsAmount; i++)
-                    {
-                        ProcessRaycast();
-                    }
-                    ammoSlot.ReduceCurrentAmmo(ammoType);
+                    ProcessRaycast();
                 }
-                else
-                {
-                    audiosource.PlayOneShot(emptyShotgunSFX);
-                }
-                break;
+            }
+            else
+            {
+                ProcessRaycast();
+            }
+
+            ammoSlot.ReduceCurrentAmmo(ammoType);
+        }
+        else
+        {
+            PlayRandomAudioClip(weaponData.emptyShootSFX);
         }
 
-        yield return new WaitForSeconds(timeBetweenShots);
+        yield return new WaitForSeconds(weaponData.timeBetweenShots);
         canShoot = true;
     }
 
-    void ProcessRaycast()
+    private void ProcessRaycast()
     {
         RaycastHit hit;
         Vector3 direction = GetShotgunSpread();
 
-        Debug.DrawRay(weaponCamera.transform.position, direction * range, Color.red, 5f);
-
-        if (Physics.Raycast(weaponCamera.transform.position, weaponCamera.transform.forward, out hit, range))
+        if (Physics.Raycast(weaponCamera.transform.position, direction, out hit, weaponData.range))
         {
             CreateImpactHit(hit);
 
-            // Initialize enemyHealth here
             enemyHealth = hit.transform.GetComponent<EnemyHealth>();
-
             if (enemyHealth != null)
             {
-                enemyHealth.TakeDamage(damage);
+                enemyHealth.TakeDamage(weaponData.damage);
                 enemyController = hit.transform.GetComponent<EnemyController>();
-
-                if (enemyController == null)
-                {
-                    enemyController = hit.transform.GetComponent<EnemyController>();
-                }
 
                 if (enemyController != null)
                 {
-                    // Alert this enemy to the player's position
                     enemyController.AlertToPlayer(transform.position);
-
-                    // Call AlertEnemiesNearTarget to alert nearby enemies
                     AlertEnemiesNearTarget(hit.point, enemyController);
                 }
             }
         }
-        else
-        {
-            return;
-        }
     }
 
-    void PlayMuzzleFlash()
+    private void PlayMuzzleFlash()
     {
         muzzleFlash.Play();
     }
 
-    void CreateImpactHit(RaycastHit hit)
+    private void CreateImpactHit(RaycastHit hit)
     {
         GameObject impact = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
         Destroy(impact, 0.1f);
-
         AlertEnemies(hit.point);
     }
 
-    void AlertEnemies(Vector3 impactPoint)
+    private void AlertEnemies(Vector3 impactPoint)
     {
         float alertRadius = 20f;
-
         Collider[] colliders = Physics.OverlapSphere(impactPoint, alertRadius);
-
-        //Debug.Log("AlertEnemies called. Colliders found" + colliders.Length);
 
         foreach (Collider collider in colliders)
         {
-            EnemyController enemyController = collider.GetComponentInParent<EnemyController>();
-
-            if (enemyController != null)
+            EnemyController enemyCtrl = collider.GetComponentInParent<EnemyController>();
+            if (enemyCtrl != null)
             {
-                enemyController.InvestigateSound(impactPoint);
+                enemyCtrl.InvestigateSound(impactPoint);
             }
         }
     }
 
-    void AlertEnemiesNearTarget(Vector3 targetPosition, EnemyController shotEnemy)
+    private void AlertEnemiesNearTarget(Vector3 targetPosition, EnemyController shotEnemy)
     {
-        if (shotEnemy == null)
-        {
-            Debug.LogWarning("shotEnemy is null, cannot alert nearby enemies.");
-            return; // Exit the method if shotEnemy is null
-        }
+        if (shotEnemy == null) return;
 
-        float alertRadius = 15f; // Adjust this value as needed
+        float alertRadius = 15f;
         Collider[] colliders = Physics.OverlapSphere(targetPosition, alertRadius);
 
         foreach (Collider collider in colliders)
         {
-            EnemyController enemyController = collider.GetComponent<EnemyController>();
-
-            if (enemyController == null)
+            EnemyController enemyCtrl = collider.GetComponentInParent<EnemyController>();
+            if (enemyCtrl != null && enemyCtrl != shotEnemy && !enemyHealth.IsDead())
             {
-                // Try to get the EnemyController from the parent
-                enemyController = collider.GetComponentInParent<EnemyController>();
-            }
-
-            if (enemyController != null && !enemyHealth.IsDead())  // Make sure enemyHealth is valid
-            {
-                // Exclude the enemy that was shot
-                if (enemyController != shotEnemy)
-                {
-                    // Alert the enemy to the player's position
-                    enemyController.AlertToPlayer(transform.position);
-                }
+                enemyCtrl.AlertToPlayer(transform.position);
             }
         }
     }
 
-    void DispalyAmmo()
+    private void DisplayAmmo()
     {
         int currentAmmo = ammoSlot.GetCurrentAmmo(ammoType);
         ammoText.text = currentAmmo.ToString();
     }
 
-    Vector3 GetShotgunSpread()
+    private Vector3 GetShotgunSpread()
     {
         Vector3 direction = weaponCamera.transform.forward;
-        direction.x += Random.Range(-bulletSpread, bulletSpread);
-        direction.y += Random.Range(-bulletSpread, bulletSpread);
+        direction.x += Random.Range(-weaponData.bulletSpread, weaponData.bulletSpread);
+        direction.y += Random.Range(-weaponData.bulletSpread, weaponData.bulletSpread);
         return direction;
     }
 
-    void DisableAnimations()
+    private void DisableAnimations()
     {
-        if (Input.GetMouseButtonUp(0) && weaponType == WeaponType.SMG)
+        if (Input.GetMouseButtonUp(0) && weaponData.weaponType == WeaponSO.WeaponType.SMG)
         {
             animator.SetBool("isShooting", false);
         }
-
-        /* else if (Input.GetMouseButtonUp(0) && weaponType == WeaponType.Shotgun)
-        {
-            animator.SetBool("isShotgunShooting", false);
-        } */
     }
 
+    private void PlayRandomAudioClip(AudioClip[] clips)
+    {
+        if (clips.Length == 0) return;
+        int index = Random.Range(0, clips.Length);
+        audioSource.PlayOneShot(clips[index]);
+    }
 }
