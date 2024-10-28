@@ -132,23 +132,6 @@ public class Weapon : MonoBehaviour
                     audiosource.PlayOneShot(emptyShotgunSFX);
                 }
                 break;
-
-                // You can probably use something like this instead of "else" in each switch case
-
-                /*default:
-                    if (WeaponType.Pistol)
-                    {
-                        audiosource.PlayOneShot(emptyGunSFX);
-                    }
-                    else if (WeaponType.SMG)
-                    {
-                        audiosource.PlayOneShot(emptyGunSFX);
-                    }
-                    else if (WeaponType.ShotGun)
-                    {
-                        audiosource.PlayOneShot(emptyGunSFX);
-                    }
-                    break;*/
         }
 
         yield return new WaitForSeconds(timeBetweenShots);
@@ -158,7 +141,6 @@ public class Weapon : MonoBehaviour
     void ProcessRaycast()
     {
         RaycastHit hit;
-
         Vector3 direction = GetShotgunSpread();
 
         Debug.DrawRay(weaponCamera.transform.position, direction * range, Color.red, 5f);
@@ -167,23 +149,28 @@ public class Weapon : MonoBehaviour
         {
             CreateImpactHit(hit);
 
-            EnemyHealth target = hit.transform.GetComponent<EnemyHealth>();
+            // Initialize enemyHealth here
+            enemyHealth = hit.transform.GetComponent<EnemyHealth>();
 
-            if (target != null)
+            if (enemyHealth != null)
             {
-                target.TakeDamage(damage);
+                enemyHealth.TakeDamage(damage);
                 enemyController = hit.transform.GetComponent<EnemyController>();
 
                 if (enemyController == null)
                 {
                     enemyController = hit.transform.GetComponent<EnemyController>();
                 }
+
                 if (enemyController != null)
                 {
+                    // Alert this enemy to the player's position
                     enemyController.AlertToPlayer(transform.position);
+
+                    // Call AlertEnemiesNearTarget to alert nearby enemies
+                    AlertEnemiesNearTarget(hit.point, enemyController);
                 }
             }
-
         }
         else
         {
@@ -210,7 +197,7 @@ public class Weapon : MonoBehaviour
 
         Collider[] colliders = Physics.OverlapSphere(impactPoint, alertRadius);
 
-        Debug.Log("AlertEnemies called. Colliders found" + colliders.Length);
+        //Debug.Log("AlertEnemies called. Colliders found" + colliders.Length);
 
         foreach (Collider collider in colliders)
         {
@@ -222,22 +209,29 @@ public class Weapon : MonoBehaviour
             }
         }
     }
+
     void AlertEnemiesNearTarget(Vector3 targetPosition, EnemyController shotEnemy)
     {
-        float alertRadius = 15f; // Adjust this value as needed
+        if (shotEnemy == null)
+        {
+            Debug.LogWarning("shotEnemy is null, cannot alert nearby enemies.");
+            return; // Exit the method if shotEnemy is null
+        }
 
+        float alertRadius = 15f; // Adjust this value as needed
         Collider[] colliders = Physics.OverlapSphere(targetPosition, alertRadius);
 
         foreach (Collider collider in colliders)
         {
             EnemyController enemyController = collider.GetComponent<EnemyController>();
+
             if (enemyController == null)
             {
                 // Try to get the EnemyController from the parent
                 enemyController = collider.GetComponentInParent<EnemyController>();
             }
 
-            if (enemyController != null && !enemyHealth.IsDead())
+            if (enemyController != null && !enemyHealth.IsDead())  // Make sure enemyHealth is valid
             {
                 // Exclude the enemy that was shot
                 if (enemyController != shotEnemy)
