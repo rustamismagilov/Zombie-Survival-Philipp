@@ -9,7 +9,6 @@ public class Weapon : MonoBehaviour
     [SerializeField] private GameObject impactEffect;
     [SerializeField] private Ammo ammoSlot;
     [SerializeField] private TextMeshProUGUI ammoText;
-    [SerializeField] private AmmoType ammoType;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private WeaponSO weaponData; // Reference to WeaponSO
 
@@ -50,7 +49,7 @@ public class Weapon : MonoBehaviour
     private IEnumerator Shoot()
     {
         canShoot = false;
-        int currentAmmo = ammoSlot.GetCurrentAmmo(ammoType);
+        int currentAmmo = ammoSlot.GetCurrentAmmo(weaponData.ammoType); // Updated to use weaponData.ammoType
 
         if (currentAmmo > 0)
         {
@@ -78,7 +77,7 @@ public class Weapon : MonoBehaviour
                 ProcessRaycast();
             }
 
-            ammoSlot.ReduceCurrentAmmo(ammoType);
+            ammoSlot.ReduceCurrentAmmo(weaponData.ammoType); // Updated to use weaponData.ammoType
         }
         else
         {
@@ -88,6 +87,13 @@ public class Weapon : MonoBehaviour
         yield return new WaitForSeconds(weaponData.timeBetweenShots);
         canShoot = true;
     }
+
+    private void DisplayAmmo()
+    {
+        int currentAmmo = ammoSlot.GetCurrentAmmo(weaponData.ammoType);
+        ammoText.text = currentAmmo.ToString();
+    }
+
 
     private void ProcessRaycast()
     {
@@ -155,12 +161,6 @@ public class Weapon : MonoBehaviour
                 enemyCtrl.AlertToPlayer(transform.position);
             }
         }
-    }
-
-    private void DisplayAmmo()
-    {
-        int currentAmmo = ammoSlot.GetCurrentAmmo(ammoType);
-        ammoText.text = currentAmmo.ToString();
     }
 
     private Vector3 GetShotgunSpread()

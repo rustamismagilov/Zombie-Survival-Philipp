@@ -94,20 +94,26 @@ public class EnemyController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        // Draw the chase range sphere in red
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
 
+        // Draw the investigation point if in investigating state
         if (currentState == EnemyState.Investigating)
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(investigationPoint, 0.5f);
         }
 
+        // Set gizmo color to yellow for view radius and angle lines
+        Gizmos.color = Color.yellow;
         Vector3 viewAngleA = DirFromAngle(-viewAngle / 2, false);
         Vector3 viewAngleB = DirFromAngle(viewAngle / 2, false);
 
+        // Draw lines for the field of view (viewAngle) and radius
         Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
         Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
+        Gizmos.DrawWireSphere(transform.position, viewRadius);
     }
 
     bool CanSeePlayer()

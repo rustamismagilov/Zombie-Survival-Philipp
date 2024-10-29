@@ -11,6 +11,7 @@ public class WeaponSO : ScriptableObject
     }
 
     public WeaponType weaponType;
+    public AmmoType ammoType; // New field for AmmoType
     public float range = 100f;
     public float damage = 40f;
     public float timeBetweenShots = 0.5f;
