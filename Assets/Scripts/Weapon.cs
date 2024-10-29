@@ -87,6 +87,7 @@ public class Weapon : MonoBehaviour
         {
             rb.isKinematic = false;
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            rb.useGravity = true;
             rb.AddForce(weaponCamera.transform.forward * weaponData.launchForce, ForceMode.Impulse);
 
             rb.drag = 0.5f;
@@ -96,11 +97,13 @@ public class Weapon : MonoBehaviour
         Grenade grenadeScript = grenade.GetComponent<Grenade>();
         if (grenadeScript != null)
         {
-            grenadeScript.Initialize(weaponData.explosionRadius, weaponData.explosionForce, weaponData.damage);
+            grenadeScript.Initialize(
+                weaponData.explosionRadius,
+                weaponData.explosionForce,
+                weaponData.damage,
+                weaponData.explosionDelay
+            );
         }
-
-        // Draw shooting trajectory line for debugging
-        //Debug.DrawRay(weaponCamera.transform.position, weaponCamera.transform.forward * 40f, Color.green, 2f);
     }
 
     private void DisplayAmmo()

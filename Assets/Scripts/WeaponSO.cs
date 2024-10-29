@@ -30,4 +30,6 @@ public class WeaponSO : ScriptableObject
     public float explosionRadius = 10f;
     public float explosionForce = 10f;
     public float launchForce = 40f;
+    public float explosionDelay = 2f;
+    public float projectileLifetime = 5f;
 }

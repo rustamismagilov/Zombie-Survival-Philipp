@@ -47,7 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6264aba7bf0ebd4b8a0fdb595260252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionDelay: 2
+  explosionEffect: {fileID: 1007127540951276610, guid: 3ace37360f306cb4aac03640550fa9ef,
+    type: 3}
 --- !u!54 &-3515382027656548510
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -58,7 +59,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -74,7 +75,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 2
+  m_CollisionDetection: 1
 --- !u!135 &8682881029775372295
 SphereCollider:
   m_ObjectHideFlags: 0

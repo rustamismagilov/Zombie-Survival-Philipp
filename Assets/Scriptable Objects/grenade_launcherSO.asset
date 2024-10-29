@@ -27,3 +27,5 @@ MonoBehaviour:
     type: 3}
   explosionRadius: 10
   explosionForce: 10
+  launchForce: 40
+  explosionDelay: 5
