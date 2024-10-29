@@ -7,13 +7,17 @@ public class Grenade : MonoBehaviour
     private float damage;
     private Vector3 previousPosition;
 
-    private bool hasExploded = false; // Add a flag to track if grenade has exploded
+    private bool hasExploded = false; // Added a flag to track if grenade has exploded
 
     [SerializeField] private ParticleSystem explosionEffect; // Explosion particle system
+    [SerializeField] private AudioClip explosionSound; // Explosion sound
+
+    private AudioSource mainCameraAudioSource; // Audio source from the main camera
 
     void Start()
     {
         previousPosition = transform.position;
+        mainCameraAudioSource = Camera.main.GetComponent<AudioSource>(); // Get the audio source from the main camera
     }
 
     void Update()
@@ -44,6 +48,12 @@ public class Grenade : MonoBehaviour
             Destroy(instantiatedEffect.gameObject, instantiatedEffect.main.duration); // Destroy particle system after it finishes
         }
 
+        // Play explosion sound using main camera's audio source
+        if (explosionSound != null && mainCameraAudioSource != null)
+        {
+            mainCameraAudioSource.PlayOneShot(explosionSound);
+        }
+
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
 
         foreach (Collider nearbyObject in colliders)
@@ -59,6 +69,22 @@ public class Grenade : MonoBehaviour
             if (enemyHealth != null)
             {
                 enemyHealth.TakeDamage(damage);
+                DisplayDamage displayDamage = enemyHealth.GetComponent<DisplayDamage>();
+                if (displayDamage != null)
+                {
+                    displayDamage.ShowDamageImpact();
+                }
+            }
+
+            PlayerHealth playerHealth = nearbyObject.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+                DisplayDamage displayDamage = playerHealth.GetComponent<DisplayDamage>();
+                if (displayDamage != null)
+                {
+                    displayDamage.ShowDamageImpact();
+                }
             }
         }
 

@@ -15,17 +15,18 @@ MonoBehaviour:
   weaponType: 3
   ammoType: 3
   range: 250
-  damage: 100
+  damage: 50
   timeBetweenShots: 3
   pelletsAmount: 1
   bulletSpread: 0
   shootSFX:
-  - {fileID: 8300000, guid: c7c5de50163df4c498567334d42322b6, type: 3}
+  - {fileID: 8300000, guid: 8fb8bba9cad0c5d4a8941fa307d2bd5b, type: 3}
   emptyShootSFX:
-  - {fileID: 8300000, guid: cd5641311bdeb664495cc6ac18c3acb4, type: 3}
+  - {fileID: 8300000, guid: 2183096b63e573d4a968b08cfb454354, type: 3}
   grenadePrefab: {fileID: 6566939590726195741, guid: 364d69fa1f4160342a76c1c1c64d7159,
     type: 3}
   explosionRadius: 10
   explosionForce: 10
   launchForce: 40
   explosionDelay: 5
+  projectileLifetime: 5

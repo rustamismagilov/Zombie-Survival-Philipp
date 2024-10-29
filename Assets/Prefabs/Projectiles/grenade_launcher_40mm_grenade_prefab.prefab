@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7797195227441854544}
   - component: {fileID: 5133345539755356608}
   - component: {fileID: -3515382027656548510}
-  - component: {fileID: 8682881029775372295}
+  - component: {fileID: 7086983471999556731}
   m_Layer: 0
   m_Name: grenade_launcher_40mm_grenade_prefab
   m_TagString: Untagged
@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explosionEffect: {fileID: 1007127540951276610, guid: 3ace37360f306cb4aac03640550fa9ef,
     type: 3}
+  explosionSound: {fileID: 8300000, guid: da7183e4fbb5fe24b96616ae9efe437a, type: 3}
 --- !u!54 &-3515382027656548510
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -76,14 +77,14 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!135 &8682881029775372295
-SphereCollider:
+--- !u!136 &7086983471999556731
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6566939590726195741}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 0bea36bfce3b7cf4587d99aa44a4cd8f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -94,9 +95,11 @@ SphereCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
+  serializedVersion: 2
   m_Radius: 0.04
-  m_Center: {x: 0, y: 0, z: 0.03}
+  m_Height: 0.09
+  m_Direction: 2
+  m_Center: {x: 0, y: -0, z: 0.03}
 --- !u!1001 &1276909037848950140
 PrefabInstance:
   m_ObjectHideFlags: 0
