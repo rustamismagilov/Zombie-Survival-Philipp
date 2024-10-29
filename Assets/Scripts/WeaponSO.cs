@@ -12,7 +12,7 @@ public class WeaponSO : ScriptableObject
     }
 
     public WeaponType weaponType;
-    public AmmoType ammoType; // New field for AmmoType
+    public AmmoType ammoType;
     public float range = 100f;
     public float damage = 40f;
     public float timeBetweenShots = 0.5f;
@@ -26,7 +26,8 @@ public class WeaponSO : ScriptableObject
     public AudioClip[] emptyShootSFX;
 
     [Header("Grenade Launcher Settings")]
-    public GameObject grenadePrefab; // Grenade prefab
-    public float explosionRadius = 5f;
-    public float explosionForce = 1000f;
+    public GameObject grenadePrefab;
+    public float explosionRadius = 10f;
+    public float explosionForce = 10f;
+    public float launchForce = 40f;
 }

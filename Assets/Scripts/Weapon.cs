@@ -80,19 +80,27 @@ public class Weapon : MonoBehaviour
 
     private void LaunchGrenade()
     {
-        GameObject grenade = Instantiate(weaponData.grenadePrefab, weaponCamera.transform.position, Quaternion.identity);
+        GameObject grenade = Instantiate(weaponData.grenadePrefab, weaponCamera.transform.position, weaponCamera.transform.rotation);
         Rigidbody rb = grenade.GetComponent<Rigidbody>();
+
         if (rb != null)
         {
-            rb.AddForce(weaponCamera.transform.forward * 40f, ForceMode.Impulse);
+            rb.isKinematic = false;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            rb.AddForce(weaponCamera.transform.forward * weaponData.launchForce, ForceMode.Impulse);
+
+            rb.drag = 0.5f;
+            rb.angularDrag = 0.05f;
         }
 
-        // Initialize grenade settings based on WeaponSO data
         Grenade grenadeScript = grenade.GetComponent<Grenade>();
         if (grenadeScript != null)
         {
             grenadeScript.Initialize(weaponData.explosionRadius, weaponData.explosionForce, weaponData.damage);
         }
+
+        // Draw shooting trajectory line for debugging
+        //Debug.DrawRay(weaponCamera.transform.position, weaponCamera.transform.forward * 40f, Color.green, 2f);
     }
 
     private void DisplayAmmo()
@@ -105,6 +113,8 @@ public class Weapon : MonoBehaviour
     {
         RaycastHit hit;
         Vector3 direction = GetShotgunSpread();
+
+        Debug.DrawRay(weaponCamera.transform.position, direction * weaponData.range, Color.red, 5f);
 
         if (Physics.Raycast(weaponCamera.transform.position, direction, out hit, weaponData.range))
         {

@@ -6,6 +6,18 @@ public class Grenade : MonoBehaviour
     private float explosionRadius;
     private float explosionForce;
     private float damage;
+    private Vector3 previousPosition;
+
+    void Start()
+    {
+        previousPosition = transform.position;
+    }
+
+    void Update()
+    {
+        Debug.DrawLine(previousPosition, transform.position, Color.green, 1f);
+        previousPosition = transform.position;
+    }
 
     public void Initialize(float radius, float force, float dmg)
     {
@@ -18,7 +30,10 @@ public class Grenade : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         // Explode upon hitting any surface
-        Explode();
+        if (collision.collider != null)
+        {
+            Explode();
+        }
     }
 
     private void Explode()

@@ -149,6 +149,8 @@ MonoBehaviour:
     ammoAmount: 30
   - ammoType: 1
     ammoAmount: 5
+  - ammoType: 3
+    ammoAmount: 6
 --- !u!114 &3912124449632397841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -677,6 +679,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 7900475826199599001}
+    - targetCorrespondingSourceObject: {fileID: 3803833170785497763, guid: 2c01091e5323b404aa06d106f50b9cc5,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3368055622902787192}
   m_SourcePrefab: {fileID: 100100000, guid: 2c01091e5323b404aa06d106f50b9cc5, type: 3}
 --- !u!4 &95877178761691511 stripped
 Transform:
@@ -716,3 +722,24 @@ MonoBehaviour:
   audioSource: {fileID: 6339082103902187606}
   weaponData: {fileID: 11400000, guid: f693bfc107038d84e97cd722a43b7c5e, type: 2}
   canShoot: 1
+--- !u!95 &3368055622902787192
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5124598571140326134}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8f3820300d11e214f931ad14aff6bdfa, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

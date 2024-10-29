@@ -128,7 +128,7 @@ public class EnemyController : MonoBehaviour
 
             if (angleBetweenEnemyAndTarget <= viewAngle / 2)
             {
-                if(!Physics.Linecast(transform.position + Vector3.up * 3f, 
+                if (!Physics.Linecast(transform.position + Vector3.up * 3f,
                     target.position + Vector3.up * 3f, obstacleMask))
                 {
                     return true;
@@ -142,8 +142,8 @@ public class EnemyController : MonoBehaviour
     {
         if (navMeshAgent.enabled)
         {
-            if (!navMeshAgent.pathPending&&
-                navMeshAgent.remainingDistance<=navMeshAgent.stoppingDistance)
+            if (!navMeshAgent.pathPending &&
+                navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
             {
                 navMeshAgent.isStopped = true;
                 animator.SetBool("isMoving", false);
