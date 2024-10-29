@@ -7,7 +7,8 @@ public class WeaponSO : ScriptableObject
     {
         Pistol,
         SMG,
-        Shotgun
+        Shotgun,
+        GrenadeLauncher
     }
 
     public WeaponType weaponType;
@@ -23,4 +24,9 @@ public class WeaponSO : ScriptableObject
 
     [Header("Empty Weapon Sounds")]
     public AudioClip[] emptyShootSFX;
+
+    [Header("Grenade Launcher Settings")]
+    public GameObject grenadePrefab; // Grenade prefab
+    public float explosionRadius = 5f;
+    public float explosionForce = 1000f;
 }

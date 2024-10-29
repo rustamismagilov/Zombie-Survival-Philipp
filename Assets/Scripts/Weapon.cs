@@ -10,7 +10,7 @@ public class Weapon : MonoBehaviour
     [SerializeField] private Ammo ammoSlot;
     [SerializeField] private TextMeshProUGUI ammoText;
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private WeaponSO weaponData; // Reference to WeaponSO
+    [SerializeField] private WeaponSO weaponData;
 
     [HideInInspector] public bool canShoot = true;
 
@@ -49,35 +49,25 @@ public class Weapon : MonoBehaviour
     private IEnumerator Shoot()
     {
         canShoot = false;
-        int currentAmmo = ammoSlot.GetCurrentAmmo(weaponData.ammoType); // Updated to use weaponData.ammoType
+        int currentAmmo = ammoSlot.GetCurrentAmmo(weaponData.ammoType);
 
         if (currentAmmo > 0)
         {
             PlayMuzzleFlash();
             PlayRandomAudioClip(weaponData.shootSFX);
 
-            if (weaponData.weaponType == WeaponSO.WeaponType.SMG)
-            {
-                animator.SetBool("isShooting", true);
-            }
-            else
-            {
-                animator.SetTrigger("Shoot");
-            }
+            animator.SetTrigger("Shoot");
 
-            if (weaponData.weaponType == WeaponSO.WeaponType.Shotgun)
+            if (weaponData.weaponType == WeaponSO.WeaponType.GrenadeLauncher)
             {
-                for (int i = 0; i < weaponData.pelletsAmount; i++)
-                {
-                    ProcessRaycast();
-                }
+                LaunchGrenade();
             }
             else
             {
                 ProcessRaycast();
             }
 
-            ammoSlot.ReduceCurrentAmmo(weaponData.ammoType); // Updated to use weaponData.ammoType
+            ammoSlot.ReduceCurrentAmmo(weaponData.ammoType);
         }
         else
         {
@@ -88,12 +78,28 @@ public class Weapon : MonoBehaviour
         canShoot = true;
     }
 
+    private void LaunchGrenade()
+    {
+        GameObject grenade = Instantiate(weaponData.grenadePrefab, weaponCamera.transform.position, Quaternion.identity);
+        Rigidbody rb = grenade.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.AddForce(weaponCamera.transform.forward * 40f, ForceMode.Impulse);
+        }
+
+        // Initialize grenade settings based on WeaponSO data
+        Grenade grenadeScript = grenade.GetComponent<Grenade>();
+        if (grenadeScript != null)
+        {
+            grenadeScript.Initialize(weaponData.explosionRadius, weaponData.explosionForce, weaponData.damage);
+        }
+    }
+
     private void DisplayAmmo()
     {
         int currentAmmo = ammoSlot.GetCurrentAmmo(weaponData.ammoType);
         ammoText.text = currentAmmo.ToString();
     }
-
 
     private void ProcessRaycast()
     {
